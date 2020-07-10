@@ -1,2 +1,4 @@
 *.log
 mysettings.py
+__pycache__
+/images
