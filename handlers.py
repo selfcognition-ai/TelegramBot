@@ -3,6 +3,9 @@ import logging
 import os
 from random import choice
 
+from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup, ParseMode
+from telegram.ext import ConversationHandler
+
 from utils import get_keyboard, get_user_emo, is_cat
 
 def greet_user(bot, update, user_data):
@@ -57,3 +60,44 @@ def check_user_photo(bot, update, user_data):
 	else:
 		os.remove(filename)
 		update.message.reply_text('Котика не нашлось')
+
+def anketa_start(bot, update, user_data):
+	update.message.reply_text('Укажите имя и фамилию', reply_markup=ReplyKeyboardRemove())
+	return "name"
+
+def anketa_get_name(bot, update, user_data):
+	user_name = update.message.text
+	if len(user_name.split(" ")) != 2:
+		update.message.reply_text('Вы не ввели имя и фамилию')
+		return "name"
+	else:
+		user_data['anketa_name'] = user_name
+		reply_keyboard = [('1', '2', '3', '4', '5')]
+
+		update.message.reply_text(
+			'Пожалуйста оцените бота',
+			reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True, resize_keyboard=True)
+		)		
+		return "rating"
+
+def anketa_rating(bot, update, user_data):
+	user_data['anketa_rating'] = update.message.text
+	update.message.reply_text("""Спасибо за вашу оценку {}!
+Пожалуйста напишите отзыв или /skip, что бы пропустить""".format(user_data['anketa_rating']))
+	return "comment"
+
+def anketa_comment(bot, update, user_data):
+	user_data['anketa_comment'] = update.message.text
+	text = """
+<b>Фамилия Имя:</b> {anketa_name}
+<b>Оценка:</b> {anketa_rating}
+<b>Ваш комментарий:</b> {anketa_comment}""".format(**user_data)
+	update.message.reply_text(text, reply_markup=get_keyboard(), parse_mode='html')
+	return ConversationHandler.END
+
+def anketa_skip_comment(bot, update, user_data):
+	text = """
+<b>Фамилия Имя:</b> {anketa_name}
+<b>Оценка:</b> {anketa_rating}""".format(**user_data)
+	update.message.reply_text(text, reply_markup=get_keyboard(), parse_mode=ParseMode.HTML)
+	return ConversationHandler.END

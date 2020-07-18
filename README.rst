@@ -9,7 +9,7 @@ TTB - бот, цель которого изучение телеграм бот
 
 .. code-block:: text
 
-	pip install -r reauirements.txt
+	pip install -r requirements.txt
 
 Положите картинки котиков в папку images, название файлов должно начинаться с cat и иметь расширение .jpg или .jpeg
 
