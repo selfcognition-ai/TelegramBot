@@ -23,11 +23,13 @@ def main():
 			"comment": [CommandHandler('skip', anketa_skip_comment, pass_user_data=True),
 						MessageHandler(Filters.text, anketa_comment, pass_user_data=True)],
 		},
-		fallbacks=[]
+		fallbacks=[MessageHandler(
+			Filters.text | Filters.photo | Filters.video | Filters.document,
+			dontknow, pass_user_data=True)]
 	)
-	dp.add_handler(anketa)
-
+	
 	dp.add_handler(CommandHandler("start", greet_user, pass_user_data=True))
+	dp.add_handler(anketa)	
 	dp.add_handler(CommandHandler('cat', send_cat_picture, pass_user_data=True))
 	dp.add_handler(CommandHandler('change_avatar', change_avatar, pass_user_data=True))
 	dp.add_handler(MessageHandler(Filters.contact, get_contact, pass_user_data=True))
